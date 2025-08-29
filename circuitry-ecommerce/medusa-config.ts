@@ -14,8 +14,14 @@ module.exports = defineConfig({
     }
   },
   
-  modules: {
-    [Modules.PAYMENT]: {
+  modules: [
+    // Modulo brand personalizzato
+    {
+      resolve: "./src/modules/brand",
+    },
+    // Moduli esistenti
+    {
+      key: Modules.PAYMENT,
       resolve: "@medusajs/medusa/payment",
       options: {
         providers: [
@@ -29,7 +35,8 @@ module.exports = defineConfig({
         ],
       },
     },
-    [Modules.AUTH]: {
+    {
+      key: Modules.AUTH,
       resolve: "@medusajs/medusa/auth",
       dependencies: [Modules.CACHE, ContainerRegistrationKeys.LOGGER],
       options: {
@@ -53,5 +60,5 @@ module.exports = defineConfig({
         ],
       },
     },
-  },
+  ],
 })
