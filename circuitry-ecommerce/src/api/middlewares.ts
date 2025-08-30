@@ -7,6 +7,7 @@ import {
 import { z } from "zod"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { GetAdminReviewsSchema } from "../admin/reviews/route"
+import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
 
 // ----------------- ADMIN -----------------
 
@@ -89,6 +90,15 @@ export default defineMiddlewares({
         }),
       ],
     },
+
+    {
+      matcher: "/admin/reviews/status",
+      method: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostAdminUpdateReviewsStatusSchema),
+      ],
+    },
+
 
     // --- STORE ROUTES ---
     {

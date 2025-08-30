@@ -2,6 +2,7 @@ import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { ChatBubbleLeftRight } from "@medusajs/icons"
 import { 
   createDataTableColumnHelper, 
+  createDataTableCommandHelper,
   Container, 
   DataTable, 
   useDataTable, 
@@ -9,6 +10,8 @@ import {
   StatusBadge, 
   Toaster, 
   DataTablePaginationState,
+  DataTableRowSelectionState,
+  toast,
 } from "@medusajs/ui"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo, useState } from "react"
@@ -30,10 +33,10 @@ type Review = {
   customer?: HttpTypes.AdminCustomer
 }
 
-
 const columnHelper = createDataTableColumnHelper<Review>()
 
 const columns = [
+  columnHelper.select(),
   columnHelper.accessor("id", {
     header: "ID",
   }),
