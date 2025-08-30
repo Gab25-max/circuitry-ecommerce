@@ -8,6 +8,7 @@ import { z } from "zod"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { GetAdminReviewsSchema } from "../admin/reviews/route"
 import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
+import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
 
 // ----------------- ADMIN -----------------
 
@@ -99,7 +100,6 @@ export default defineMiddlewares({
       ],
     },
 
-
     // --- STORE ROUTES ---
     {
       matcher: "/store/reviews",
@@ -109,8 +109,23 @@ export default defineMiddlewares({
         validateAndTransformBody(PostStoreReviewSchema),
       ],
     },
+    {
+      matcher: "/store/products/:id/reviews",
+      method: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetStoreReviewsSchema, {
+          isList: true,
+          defaults: [
+            "id", 
+            "rating", 
+            "title", 
+            "first_name", 
+            "last_name", 
+            "content", 
+            "created_at",
+          ],
+        }),
+      ],
+    },
   ],
 })
-
-
-
