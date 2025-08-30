@@ -6,6 +6,7 @@ import {
 } from "@medusajs/framework/http"
 import { z } from "zod"
 import { createFindParams } from "@medusajs/medusa/api/utils/validators"
+import { GetAdminReviewsSchema } from "../admin/reviews/route"
 
 // ----------------- ADMIN -----------------
 
@@ -66,6 +67,29 @@ export default defineMiddlewares({
       },
     },
 
+    // --- NEW ADMIN REVIEWS ROUTE ---
+    {
+      matcher: "/admin/reviews",
+      method: ["GET"],
+      middlewares: [
+        validateAndTransformQuery(GetAdminReviewsSchema, {
+          isList: true,
+          defaults: [
+            "id",
+            "title",
+            "content",
+            "rating",
+            "product_id",
+            "customer_id",
+            "status",
+            "created_at",
+            "updated_at",
+            "product.*",
+          ],
+        }),
+      ],
+    },
+
     // --- STORE ROUTES ---
     {
       matcher: "/store/reviews",
@@ -77,3 +101,6 @@ export default defineMiddlewares({
     },
   ],
 })
+
+
+
