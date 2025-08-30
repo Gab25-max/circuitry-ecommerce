@@ -19,6 +19,10 @@ module.exports = defineConfig({
     {
       resolve: "./src/modules/brand",
     },
+    // Modulo product-review personalizzato
+    {
+      resolve: "./src/modules/product-review",
+    },
     // Moduli esistenti
     {
       key: Modules.PAYMENT,
