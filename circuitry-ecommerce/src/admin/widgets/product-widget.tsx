@@ -1,0 +1,32 @@
+import { defineWidgetConfig } from "@medusajs/admin-sdk"
+import { Container, Heading } from "@medusajs/ui"
+import { 
+  DetailWidgetProps, 
+  AdminProduct,
+} from "@medusajs/framework/types"
+
+// The widget
+const ProductWidget = ({ 
+  data,
+}: DetailWidgetProps<AdminProduct>) => {
+  if (!data.metadata?.brand) {
+    return null // Don't show the widget if the product has no brand
+  }
+
+  return (
+    <Container className="divide-y p-0">
+      <div className="flex items-center justify-between px-6 py-4">
+        <Heading level="h2">
+          Brand: {data.metadata.brand}
+        </Heading>
+      </div>
+    </Container>
+  )
+}
+
+// The widget's configurations
+export const config = defineWidgetConfig({
+  zone: "product.details.before",
+})
+
+export default ProductWidget
