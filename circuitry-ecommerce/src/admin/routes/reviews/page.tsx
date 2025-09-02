@@ -2,7 +2,6 @@ import { defineRouteConfig } from "@medusajs/admin-sdk"
 import { ChatBubbleLeftRight } from "@medusajs/icons"
 import { 
   createDataTableColumnHelper, 
-  createDataTableCommandHelper,
   Container, 
   DataTable, 
   useDataTable, 
@@ -10,6 +9,7 @@ import {
   StatusBadge, 
   Toaster, 
   DataTablePaginationState,
+  createDataTableCommandHelper, 
   DataTableRowSelectionState,
   toast,
 } from "@medusajs/ui"
@@ -58,7 +58,7 @@ const columns = [
       return (
         <StatusBadge color={color}>
           {row.original.status.charAt(0).toUpperCase() + row.original.status.slice(1)}
-          </StatusBadge>
+        </StatusBadge>
       )
     },
   }),
@@ -76,6 +76,53 @@ const columns = [
   }),
 ]
 
+const commandHelper = createDataTableCommandHelper()
+
+const useCommands = (refetch: () => void) => {
+  return [
+    commandHelper.command({
+      label: "Approve",
+      shortcut: "A",
+      action: async (selection) => {
+        const reviewsToApproveIds = Object.keys(selection)
+
+        sdk.client.fetch("/admin/reviews/status", {
+          method: "POST",
+          body: {
+            ids: reviewsToApproveIds,
+            status: "approved",
+          },
+        }).then(() => {
+          toast.success("Reviews approved")
+          refetch()
+        }).catch(() => {
+          toast.error("Failed to approve reviews")
+        })
+      },
+    }),
+    commandHelper.command({
+      label: "Reject",
+      shortcut: "R",
+      action: async (selection) => {
+        const reviewsToRejectIds = Object.keys(selection)
+
+        sdk.client.fetch("/admin/reviews/status", {
+          method: "POST",
+          body: {
+            ids: reviewsToRejectIds,
+            status: "rejected",
+          },
+        }).then(() => {
+          toast.success("Reviews rejected")
+          refetch()
+        }).catch(() => {
+          toast.error("Failed to reject reviews")
+        })
+      },
+    }),
+  ]
+}
+
 const limit = 15
 
 const ReviewsPage = () => {
@@ -83,6 +130,8 @@ const ReviewsPage = () => {
     pageSize: limit,
     pageIndex: 0,
   })
+  
+  const [rowSelection, setRowSelection] = useState<DataTableRowSelectionState>({})
 
   const offset = useMemo(() => {
     return pagination.pageIndex * limit
@@ -104,6 +153,8 @@ const ReviewsPage = () => {
     }),
   })
 
+  const commands = useCommands(refetch)
+
   const table = useDataTable({
     columns,
     data: data?.reviews || [],
@@ -114,6 +165,11 @@ const ReviewsPage = () => {
       onPaginationChange: setPagination,
     },
     getRowId: (row) => row.id,
+    commands,
+    rowSelection: {
+      state: rowSelection,
+      onRowSelectionChange: setRowSelection,
+    },
   })
 
   return (
@@ -126,6 +182,7 @@ const ReviewsPage = () => {
         </DataTable.Toolbar>
         <DataTable.Table />
         <DataTable.Pagination />
+        <DataTable.CommandBar selectedLabel={(count) => `${count} selected`} />
       </DataTable>
       <Toaster />
     </Container>
