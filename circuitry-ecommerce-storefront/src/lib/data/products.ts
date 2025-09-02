@@ -149,9 +149,11 @@ export const getProductReviews = async ({
   const headers = {
     ...(await getAuthHeaders()),
   }
+
   const next = {
     ...(await getCacheOptions(`product-reviews-${productId}`)),
   }
+
   return sdk.client.fetch<{
     reviews: StoreProductReview[]
     average_rating: number
@@ -181,6 +183,7 @@ export const addProductReview = async (input: {
   const headers = {
     ...(await getAuthHeaders()),
   }
+
   return sdk.client.fetch(`/store/reviews`, {
     method: "POST",
     headers,
