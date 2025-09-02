@@ -194,3 +194,31 @@ export const addProductReview = async (input: {
     cache: "no-store",
   })
 }
+
+export const getCustomVariantPrice = async ({
+  variant_id,
+  region_id,
+  metadata,
+}: {
+  variant_id: string
+  region_id: string
+  metadata?: Record<string, any>
+}) => {
+  const headers = {
+    ...(await getAuthHeaders()),
+  }
+  return sdk.client
+    .fetch<{ price: number }>(
+      `/store/variants/${variant_id}/price`,
+      {
+        method: "POST",
+        body: {
+          region_id,
+          metadata,
+        },
+        headers,
+        cache: "no-cache",
+      }
+    )
+    .then(({ price }) => price)
+}

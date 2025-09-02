@@ -11,6 +11,7 @@ import { useParams } from "next/navigation"
 import { useEffect, useMemo, useRef, useState } from "react"
 import ProductPrice from "../product-price"
 import MobileActions from "./mobile-actions"
+import Input from "../../../common/components/input"
 
 type ProductActionsProps = {
   product: HttpTypes.StoreProduct
@@ -30,9 +31,12 @@ const optionsAsKeymap = (
 export default function ProductActions({
   product,
   disabled,
+  region,
 }: ProductActionsProps) {
   const [options, setOptions] = useState<Record<string, string | undefined>>({})
   const [isAdding, setIsAdding] = useState(false)
+  const [height, setHeight] = useState(0)
+  const [width, setWidth] = useState(0)
   const countryCode = useParams().countryCode as string
 
   // If there is only 1 variant, preselect the options
@@ -138,7 +142,38 @@ export default function ProductActions({
           )}
         </div>
 
-        <ProductPrice product={product} variant={selectedVariant} />
+        <div className="flex flex-col gap-y-2">
+          {!!product.metadata?.is_personalized && (
+            <div className="flex flex-col gap-y-3">
+              <span className="text-sm">Enter Dimensions</span>
+              <div className="flex gap-3">
+                <Input
+                  name="width"
+                  value={width}
+                  onChange={(e) => setWidth(Number(e.target.value))}
+                  label="Width (cm)"
+                  type="number"
+                  min={0}
+                />
+                <Input
+                  name="height"
+                  value={height}
+                  onChange={(e) => setHeight(Number(e.target.value))}
+                  label="Height (cm)"
+                  type="number"
+                  min={0}
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        <ProductPrice 
+          product={product} 
+          variant={selectedVariant}
+          region={region}
+          metadata={{ width, height }}
+        />
 
         <Button
           onClick={handleAddToCart}
@@ -147,8 +182,9 @@ export default function ProductActions({
             !selectedVariant ||
             !!disabled ||
             isAdding ||
-            !isValidVariant
-          }
+            !isValidVariant ||
+            (!!product.metadata?.is_personalized && (!width || !height))
+      }
           variant="primary"
           className="w-full h-10"
           isLoading={isAdding}

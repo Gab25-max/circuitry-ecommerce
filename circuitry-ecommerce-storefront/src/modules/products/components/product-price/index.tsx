@@ -1,58 +1,64 @@
 import { clx } from "@medusajs/ui"
-
-import { getProductPrice } from "@lib/util/get-product-price"
 import { HttpTypes } from "@medusajs/types"
+import { useEffect, useMemo, useState } from "react"
+import { getCustomVariantPrice } from "../../../../lib/data/products"
+import { convertToLocale } from "../../../../lib/util/money"
 
 export default function ProductPrice({
   product,
   variant,
+  metadata,
+  region,
 }: {
   product: HttpTypes.StoreProduct
   variant?: HttpTypes.StoreProductVariant
+  metadata?: Record<string, any>
+  region: HttpTypes.StoreRegion
 }) {
-  const { cheapestPrice, variantPrice } = getProductPrice({
-    product,
-    variantId: variant?.id,
-  })
+  const [price, setPrice] = useState(0)
+  
+  useEffect(() => {
+    if (
+      !variant ||
+      (product.metadata?.is_personalized && (
+        !metadata?.height || !metadata?.width
+      ))
+    ) {
+      return
+    }
 
-  const selectedPrice = variant ? variantPrice : cheapestPrice
+    getCustomVariantPrice({
+      variant_id: variant.id,
+      region_id: region.id,
+      metadata,
+    })
+      .then((price) => {
+        setPrice(price)
+      })
+      .catch((error) => {
+        console.error("Error fetching custom variant price:", error)
+      })
+  }, [metadata, variant])
 
-  if (!selectedPrice) {
-    return <div className="block w-32 h-9 bg-gray-100 animate-pulse" />
-  }
+  const displayPrice = useMemo(() => {
+    return convertToLocale({
+      amount: price,
+      currency_code: region.currency_code,
+    })
+  }, [price])
 
   return (
     <div className="flex flex-col text-ui-fg-base">
       <span
-        className={clx("text-xl-semi", {
-          "text-ui-fg-interactive": selectedPrice.price_type === "sale",
-        })}
+        className={clx("text-xl-semi")}
       >
-        {!variant && "From "}
-        <span
+        {price > 0 && <span
           data-testid="product-price"
-          data-value={selectedPrice.calculated_price_number}
+          data-value={displayPrice}
         >
-          {selectedPrice.calculated_price}
-        </span>
+          {displayPrice}
+        </span>}
       </span>
-      {selectedPrice.price_type === "sale" && (
-        <>
-          <p>
-            <span className="text-ui-fg-subtle">Original: </span>
-            <span
-              className="line-through"
-              data-testid="original-product-price"
-              data-value={selectedPrice.original_price_number}
-            >
-              {selectedPrice.original_price}
-            </span>
-          </p>
-          <span className="text-ui-fg-interactive">
-            -{selectedPrice.percentage_diff}%
-          </span>
-        </>
-      )}
     </div>
   )
 }

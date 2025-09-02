@@ -9,6 +9,7 @@ import { createFindParams } from "@medusajs/medusa/api/utils/validators"
 import { GetAdminReviewsSchema } from "../admin/reviews/route"
 import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
 import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
+import { PostCustomPriceSchema } from "./store/variants/[id]/price/route"
 
 // ----------------- ADMIN -----------------
 
@@ -107,6 +108,14 @@ export default defineMiddlewares({
       middlewares: [
         authenticate("customer", ["session", "bearer"]),
         validateAndTransformBody(PostStoreReviewSchema),
+      ],
+    },
+
+  {
+      matcher: "/store/variants/:id/price",
+      methods: ["POST"],
+      middlewares: [
+        validateAndTransformBody(PostCustomPriceSchema),
       ],
     },
     {
