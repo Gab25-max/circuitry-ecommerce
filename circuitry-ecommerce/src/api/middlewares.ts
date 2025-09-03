@@ -10,6 +10,7 @@ import { GetAdminReviewsSchema } from "../admin/reviews/route"
 import { PostAdminUpdateReviewsStatusSchema } from "./admin/reviews/status/route"
 import { GetStoreReviewsSchema } from "./store/products/[id]/reviews/route"
 import { PostCustomPriceSchema } from "./store/variants/[id]/price/route"
+import { SearchSchema } from "./store/products/search/route"
 
 // ----------------- ADMIN -----------------
 
@@ -117,7 +118,18 @@ export default defineMiddlewares({
       middlewares: [
         validateAndTransformBody(PostCustomPriceSchema),
       ],
+
     },
+
+    {
+      matcher: "/store/products/search",
+      method: ["POST"],
+      middlewares: [
+        validateAndTransformBody(SearchSchema),
+      ],
+    },
+
+
     {
       matcher: "/store/products/:id/reviews",
       method: ["GET"],
