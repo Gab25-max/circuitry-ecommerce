@@ -24,6 +24,7 @@
     "@stripe/stripe-js": "^1.54.2",
     "algoliasearch": "^5.37.0",
     "lodash": "^4.17.21",
+    "lucide-react": "^0.542.0",
     "next": "^15.3.1",
     "pg": "^8.11.3",
     "qs": "^6.12.1",
